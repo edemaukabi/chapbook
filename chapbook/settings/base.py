@@ -221,7 +221,7 @@ ACCOUNT_USERNAME_REQUIRED = False
 
 ELASTICSEARCH_DSL = {
     "default": {
-        "hosts": "es:9200",
+        "hosts": env("ELASTICSEARCH_URL", default="es:9200"),
     },
 }
 
