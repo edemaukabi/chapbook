@@ -7,7 +7,7 @@ import sys
 def main():
     """Run administrative tasks."""
     # TODO: change this in production
-    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "authors_api.settings.local")
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "chapbook.settings.local")
     try:
         from django.core.management import execute_from_command_line
     except ImportError as exc:

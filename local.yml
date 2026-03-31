@@ -1,6 +1,14 @@
 version: "3.9"
 
 services:
+    es:
+        image: docker.elastic.co/elasticsearch/elasticsearch:7.17.9
+        environment:
+            - discovery.type=single-node
+        ports:
+            - "9200:9200"
+        networks:
+            - chapbook
     api:
         build:
             context: .
@@ -18,9 +26,10 @@ services:
             - postgres
             - mailhog
             - redis
+            - es
         command: /start
         networks:
-            - authors-api
+            - chapbook
 
     postgres:
         build:
@@ -32,7 +41,7 @@ services:
         env_file:
             - ./.envs/.local/.postgres
         networks:
-            - authors-api
+            - chapbook
 
     mailhog:
         image: mailhog/mailhog:v1.0.0
@@ -40,12 +49,12 @@ services:
         ports:
             - "8025:8025"
         networks:
-            - authors-api
+            - chapbook
 
     redis:
         image: redis:7-alpine
         networks:
-            - authors-api
+            - chapbook
 
     celery_worker:
         build:
@@ -62,7 +71,7 @@ services:
             - postgres
             - mailhog
         networks:
-            - authors-api
+            - chapbook
 
     flower:
         build:
@@ -80,7 +89,7 @@ services:
             - redis
             - postgres
         networks:
-            - authors-api
+            - chapbook
     
     nginx:
         restart: always
@@ -95,10 +104,10 @@ services:
         ports:
             - "8080:80"
         networks:
-            - authors-api
+            - chapbook
 
 networks:
-    authors-api:
+    chapbook:
         driver: bridge
 
 volumes:

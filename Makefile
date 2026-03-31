@@ -31,8 +31,8 @@ down-v:
 volume:
 	docker volume inspect src_local_postgres_data
 
-authors-db:
-	docker compose -f local.yml exec postgres psql --username=alphaogilo --dbname=authors-live
+chapbook-db:
+	docker compose -f local.yml exec postgres psql --username=edemacode --dbname=chapbook
 
 flake8:
 	docker compose -f local.yml exec api flake8 .
@@ -54,3 +54,18 @@ isort-diff:
 
 isort:
 	docker compose -f local.yml exec api isort . --skip venv --skip migrations
+
+elastic-index:
+	docker compose -f local.yml exec api python manage.py search_index --create
+
+elastic-populate:
+	docker compose -f local.yml exec api python manage.py search_index --populate
+
+elastic-rebuild:
+	docker compose -f local.yml exec api python manage.py search_index --rebuild
+
+test-cov:
+	docker compose -f local.yml run --rm api pytest -p no:warnings --cov=. -v
+
+test-cov-html:
+	docker compose -f local.yml run --rm api pytest -p no:warnings --cov=. --cov-report html

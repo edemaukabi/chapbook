@@ -1,5 +1,6 @@
-from pathlib import Path
 from datetime import timedelta
+from pathlib import Path
+
 import environ
 
 env = environ.Env()
@@ -38,12 +39,20 @@ THIRD_PARTY_APPS = [
     "allauth.socialaccount",
     "dj_rest_auth",
     "dj_rest_auth.registration",
+    "taggit",
+    "django_elasticsearch_dsl",
+    "django_elasticsearch_dsl_drf",
 ]
 
 LOCAL_APPS = [
     "core_apps.profiles",
     "core_apps.common",
     "core_apps.users",
+    "core_apps.articles",
+    "core_apps.ratings",
+    "core_apps.bookmarks",
+    "core_apps.responses",
+    "core_apps.search",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -60,7 +69,7 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-ROOT_URLCONF = "authors_api.urls"
+ROOT_URLCONF = "chapbook.urls"
 
 TEMPLATES = [
     {
@@ -78,7 +87,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = "authors_api.wsgi.application"
+WSGI_APPLICATION = "chapbook.wsgi.application"
 
 
 # Database
@@ -192,8 +201,8 @@ SIMPLE_JWT = {
 
 REST_AUTH = {
     "USE_JWT": True,
-    "JWT_AUTH_COOKIE": "authors-access-token",
-    "JWT_AUTH_REFRESH_COOKIE": "authors-refresh-token",
+    "JWT_AUTH_COOKIE": "chapbook-access-token",
+    "JWT_AUTH_REFRESH_COOKIE": "chapbook-refresh-token",
     "REGISTER_SERIALIZER": "core_apps.users.serializers.CustomRegisterSerializer",
 }
 
@@ -209,6 +218,12 @@ ACCOUNT_CONFIRM_EMAIL_ON_GET = True
 ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 1
 ACCOUNT_USER_MODEL_USERNAME_FIELD = None
 ACCOUNT_USERNAME_REQUIRED = False
+
+ELASTICSEARCH_DSL = {
+    "default": {
+        "hosts": "es:9200",
+    },
+}
 
 
 LOGGING = {

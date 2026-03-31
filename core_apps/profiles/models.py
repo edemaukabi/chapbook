@@ -3,8 +3,8 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django_countries.fields import CountryField
 from phonenumber_field.modelfields import PhoneNumberField
-from core_apps.common.models import TimeStampedModel
 
+from core_apps.common.models import TimeStampedModel
 
 User = get_user_model()
 
@@ -69,4 +69,3 @@ class Profile(TimeStampedModel):
 
     def check_following(self, profile):
         return self.followers.filter(pkid=profile.pkid).exists()
-
