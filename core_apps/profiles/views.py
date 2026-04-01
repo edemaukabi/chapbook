@@ -1,4 +1,4 @@
-# TODO: change this in production
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.mail import send_mail
 from rest_framework import generics, status
@@ -7,8 +7,6 @@ from rest_framework.parsers import MultiPartParser
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-
-from chapbook.settings.local import DEFAULT_FROM_EMAIL
 
 from .exceptions import CantFollowYourself
 from .models import Profile
@@ -114,7 +112,7 @@ class FollowAPIView(APIView):
             user_profile.follow(profile)
             subject = "A new user follows you"
             message = f"Hi there, {profile.user.first_name}!!, the user {user_profile.user.first_name} {user_profile.user.last_name} now follows you"
-            from_email = DEFAULT_FROM_EMAIL
+            from_email = settings.DEFAULT_FROM_EMAIL
             recipient_list = [profile.user.email]
             send_mail(subject, message, from_email, recipient_list, fail_silently=True)
             return Response(
