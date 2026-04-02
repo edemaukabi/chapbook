@@ -45,3 +45,11 @@ CELERY_RESULT_BACKEND = CELERY_BROKER_URL
 
 # CORS — add frontend origin when ready
 CORS_ALLOWED_ORIGINS = env.list("CORS_ALLOWED_ORIGINS", default=[])
+
+# JWT cookies — SameSite=None required for cross-origin cookie auth (frontend on different domain).
+# Secure=True is required whenever SameSite=None is used (browser enforces this).
+REST_AUTH = {
+    **REST_AUTH,  # type: ignore[name-defined]  # noqa: F821
+    "JWT_AUTH_SAMESITE": "None",
+    "JWT_AUTH_SECURE": True,
+}
