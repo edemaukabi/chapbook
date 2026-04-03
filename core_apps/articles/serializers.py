@@ -68,7 +68,10 @@ class ArticleSerializer(serializers.ModelSerializer):
         return ArticleView.objects.filter(article=obj).count()
 
     def get_banner_image(self, obj):
-        return obj.banner_image.url
+        try:
+            return obj.banner_image.url if obj.banner_image else None
+        except Exception:
+            return None
 
     def get_created_at(self, obj):
         now = obj.created_at
