@@ -12,13 +12,21 @@ class TagListField(serializers.Field):
         return [tag.name for tag in value.all()]
 
     def to_internal_value(self, data):
+        import json as _json
+
+        # Handle JSON string sent from multipart form
+        if isinstance(data, str):
+            try:
+                data = _json.loads(data)
+            except (_json.JSONDecodeError, ValueError):
+                data = [data]
+
         if not isinstance(data, list):
             raise serializers.ValidationError("Expected a list of tags")
 
         tag_objects = []
         for tag_name in data:
-            tag_name = tag_name.strip()
-
+            tag_name = str(tag_name).strip()
             if not tag_name:
                 continue
             tag_objects.append(tag_name)

@@ -26,6 +26,7 @@ class ArticleListCreateView(generics.ListCreateAPIView):
     serializer_class = ArticleSerializer
     permission_classes = [permissions.IsAuthenticated]
     pagination_class = ArticlePagination
+    parser_classes = [MultiPartParser, FormParser]
     filter_backends = (DjangoFilterBackend, filters.OrderingFilter)
     filterset_class = ArticleFilter
     ordering_fields = [
