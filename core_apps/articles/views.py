@@ -45,11 +45,7 @@ class ArticleListCreateView(generics.ListCreateAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
-        # Use ArticleJSONRenderer wrapping for single article create response
-        return Response(
-            {"status_code": status.HTTP_201_CREATED, "article": serializer.data},
-            status=status.HTTP_201_CREATED,
-        )
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 class ArticleRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
