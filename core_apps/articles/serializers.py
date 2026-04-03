@@ -1,3 +1,5 @@
+import json as _json
+
 from rest_framework import serializers
 
 from core_apps.articles.models import Article, ArticleView, Clap
@@ -8,34 +10,33 @@ from core_apps.responses.serializers import ResponseSerializer
 
 
 class TagListField(serializers.Field):
+    """
+    Handles tags from JSON bodies (list) and multipart forms (JSON-encoded string).
+    """
+
     def to_representation(self, value):
         return [tag.name for tag in value.all()]
 
     def to_internal_value(self, data):
-        import json as _json
-
-        # Handle JSON string sent from multipart form
         if isinstance(data, str):
             try:
                 data = _json.loads(data)
             except (_json.JSONDecodeError, ValueError):
-                data = [data]
+                data = [data] if data.strip() else []
 
         if not isinstance(data, list):
-            raise serializers.ValidationError("Expected a list of tags")
+            raise serializers.ValidationError("Tags must be a list.")
 
-        tag_objects = []
-        for tag_name in data:
-            tag_name = str(tag_name).strip()
-            if not tag_name:
-                continue
-            tag_objects.append(tag_name)
-        return tag_objects
+        result = []
+        for tag in data:
+            tag = str(tag).strip().lower()
+            if tag and tag not in result:
+                result.append(tag)
+        return result
 
 
 class ArticleSerializer(serializers.ModelSerializer):
     author_info = ProfileSerializer(source="author.profile", read_only=True)
-    banner_image = serializers.ImageField(use_url=True, required=False)
     estimated_reading_time = serializers.ReadOnlyField()
     tags = TagListField()
     views = serializers.SerializerMethodField()
@@ -47,6 +48,7 @@ class ArticleSerializer(serializers.ModelSerializer):
     responses_count = serializers.SerializerMethodField()
     created_at = serializers.SerializerMethodField()
     updated_at = serializers.SerializerMethodField()
+    banner_image = serializers.ImageField(required=False, allow_null=True)
 
     def get_average_rating(self, obj):
         return obj.average_rating()
@@ -58,8 +60,7 @@ class ArticleSerializer(serializers.ModelSerializer):
         return obj.claps.count()
 
     def get_bookmarks(self, obj):
-        bookmarks = Bookmark.objects.filter(article=obj)
-        return BookmarkSerializer(bookmarks, many=True).data
+        return BookmarkSerializer(Bookmark.objects.filter(article=obj), many=True).data
 
     def get_bookmarks_count(self, obj):
         return Bookmark.objects.filter(article=obj).count()
@@ -76,35 +77,24 @@ class ArticleSerializer(serializers.ModelSerializer):
         return rep
 
     def get_created_at(self, obj):
-        now = obj.created_at
-        formatted_date = now.strftime("%m/%d/%Y, %H:%M:%S")
-        return formatted_date
+        return obj.created_at.strftime("%m/%d/%Y, %H:%M:%S")
 
     def get_updated_at(self, obj):
-        then = obj.updated_at
-        formatted_date = then.strftime("%m/%d/%Y, %H:%M:%S")
-        return formatted_date
+        return obj.updated_at.strftime("%m/%d/%Y, %H:%M:%S")
 
     def create(self, validated_data):
-        tags = validated_data.pop("tags")
+        tags = validated_data.pop("tags", [])
         article = Article.objects.create(**validated_data)
         article.tags.set(tags)
         return article
 
     def update(self, instance, validated_data):
-        instance.author = validated_data.get("author", instance.author)
-        instance.title = validated_data.get("title", instance.title)
-        instance.description = validated_data.get("description", instance.description)
-        instance.body = validated_data.get("body", instance.body)
-        instance.banner_image = validated_data.get(
-            "banner_image", instance.banner_image
-        )
-        instance.updated_at = validated_data.get("updated_at", instance.updated_at)
-
-        if "tags" in validated_data:
-            instance.tags.set(validated_data["tags"])
-
+        tags = validated_data.pop("tags", None)
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
         instance.save()
+        if tags is not None:
+            instance.tags.set(tags)
         return instance
 
     class Meta:
