@@ -31,11 +31,14 @@ class ProfileSerializer(serializers.ModelSerializer):
 
     def get_full_name(self, obj):
         first_name = obj.user.first_name.title()
-        last_name = obj.user.first_name.title()
+        last_name = obj.user.last_name.title()
         return f"{first_name} {last_name}"
 
     def get_profile_photo(self, obj):
-        return obj.profile_photo.url
+        try:
+            return obj.profile_photo.url if obj.profile_photo else None
+        except Exception:
+            return None
 
 
 class UpdateProfileSerializer(serializers.ModelSerializer):

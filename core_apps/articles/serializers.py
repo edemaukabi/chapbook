@@ -35,7 +35,7 @@ class TagListField(serializers.Field):
 
 class ArticleSerializer(serializers.ModelSerializer):
     author_info = ProfileSerializer(source="author.profile", read_only=True)
-    banner_image = serializers.SerializerMethodField()
+    banner_image = serializers.ImageField(use_url=True, required=False)
     estimated_reading_time = serializers.ReadOnlyField()
     tags = TagListField()
     views = serializers.SerializerMethodField()
@@ -67,11 +67,13 @@ class ArticleSerializer(serializers.ModelSerializer):
     def get_views(self, obj):
         return ArticleView.objects.filter(article=obj).count()
 
-    def get_banner_image(self, obj):
+    def to_representation(self, instance):
+        rep = super().to_representation(instance)
         try:
-            return obj.banner_image.url if obj.banner_image else None
+            rep["banner_image"] = instance.banner_image.url if instance.banner_image else None
         except Exception:
-            return None
+            rep["banner_image"] = None
+        return rep
 
     def get_created_at(self, obj):
         now = obj.created_at
