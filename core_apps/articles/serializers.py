@@ -48,7 +48,9 @@ class ArticleSerializer(serializers.ModelSerializer):
     responses_count = serializers.SerializerMethodField()
     created_at = serializers.SerializerMethodField()
     updated_at = serializers.SerializerMethodField()
-    banner_image = serializers.ImageField(required=False, allow_null=True)
+    # write_only so super().to_representation() skips it entirely —
+    # we add the URL ourselves below with a safe try/except
+    banner_image = serializers.ImageField(required=False, allow_null=True, write_only=True)
 
     def get_average_rating(self, obj):
         return obj.average_rating()
