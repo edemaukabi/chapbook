@@ -6,7 +6,7 @@ from django.http import Http404
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, generics, permissions, status
-from rest_framework.parsers import FormParser, MultiPartParser
+from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.response import Response
 
 from .filters import ArticleFilter
@@ -26,7 +26,7 @@ class ArticleListCreateView(generics.ListCreateAPIView):
     serializer_class = ArticleSerializer
     permission_classes = [permissions.IsAuthenticated]
     pagination_class = ArticlePagination
-    parser_classes = [MultiPartParser, FormParser]
+    parser_classes = [MultiPartParser, FormParser, JSONParser]
     filter_backends = (DjangoFilterBackend, filters.OrderingFilter)
     filterset_class = ArticleFilter
     ordering_fields = [
