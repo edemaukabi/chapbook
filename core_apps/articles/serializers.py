@@ -39,14 +39,17 @@ class ArticleSerializer(serializers.ModelSerializer):
     estimated_reading_time = serializers.ReadOnlyField()
     tags = TagListField()
     views = serializers.SerializerMethodField()
-    average_rating = serializers.ReadOnlyField()
+    average_rating = serializers.SerializerMethodField()
     bookmarks = serializers.SerializerMethodField()
     bookmarks_count = serializers.SerializerMethodField()
     claps_count = serializers.SerializerMethodField()
     responses = ResponseSerializer(many=True, read_only=True)
-    responses_count = serializers.IntegerField(source="responses.count", read_only=True)
+    responses_count = serializers.SerializerMethodField()
     created_at = serializers.SerializerMethodField()
     updated_at = serializers.SerializerMethodField()
+
+    def get_average_rating(self, obj):
+        return obj.average_rating()
 
     def get_responses_count(self, obj):
         return obj.responses.count()
@@ -60,9 +63,6 @@ class ArticleSerializer(serializers.ModelSerializer):
 
     def get_bookmarks_count(self, obj):
         return Bookmark.objects.filter(article=obj).count()
-
-    def get_average_rating(self, obj):
-        return obj.average_rating()
 
     def get_views(self, obj):
         return ArticleView.objects.filter(article=obj).count()
