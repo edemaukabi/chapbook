@@ -22,6 +22,7 @@ class ProfileListAPIView(generics.ListAPIView):
     serializer_class = ProfileSerializer
     pagination_class = ProfilePagination
     renderer_classes = [ProfilesJSONRenderer]
+    permission_classes = [permissions.AllowAny]
 
 
 class ProfileDetailAPIView(generics.RetrieveAPIView):

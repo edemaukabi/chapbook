@@ -22,7 +22,8 @@ logger = logging.getLogger(__name__)
 class ArticleListCreateView(generics.ListCreateAPIView):
     queryset = Article.objects.all()
     serializer_class = ArticleSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    # GET is public (browsing/search); POST requires login
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     pagination_class = ArticlePagination
     parser_classes = [MultiPartParser, FormParser, JSONParser]
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
@@ -38,18 +39,21 @@ class ArticleListCreateView(generics.ListCreateAPIView):
 class ArticleRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Article.objects.all()
     serializer_class = ArticleSerializer
-    permission_classes = [permissions.IsAuthenticated, IsOwnerOrReadOnly]
+    # GET is public; PATCH/DELETE require ownership
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
     lookup_field = "id"
     renderer_classes = [ArticleJSONRenderer]
     parser_classes = [MultiPartParser, FormParser, JSONParser]
 
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
-        ArticleView.record_view(
-            article=instance,
-            user=request.user,
-            viewer_ip=request.META.get("REMOTE_ADDR"),
-        )
+        # Only record views for authenticated users — AnonymousUser can't be a FK value
+        if request.user and request.user.is_authenticated:
+            ArticleView.record_view(
+                article=instance,
+                user=request.user,
+                viewer_ip=request.META.get("REMOTE_ADDR"),
+            )
         serializer = self.get_serializer(instance)
         return Response(serializer.data)
 
