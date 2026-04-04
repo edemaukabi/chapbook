@@ -31,10 +31,8 @@ class ArticleListCreateView(generics.ListCreateAPIView):
     renderer_classes = [ArticlesJSONRenderer]
 
     def perform_create(self, serializer):
-        serializer.save(author=self.request.user)
-        logger.info(
-            f"Article '{serializer.data.get('title')}' created by {self.request.user.email}"
-        )
+        article = serializer.save(author=self.request.user)
+        logger.info(f"Article '{article.title}' created by {self.request.user.email}")
 
 
 class ArticleRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
