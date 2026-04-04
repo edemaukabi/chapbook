@@ -46,6 +46,12 @@ CELERY_RESULT_BACKEND = CELERY_BROKER_URL
 # CORS — add frontend origin when ready
 CORS_ALLOWED_ORIGINS = env.list("CORS_ALLOWED_ORIGINS", default=[])
 
+# Disable django-elasticsearch-dsl's auto-registered post_save/post_delete
+# signals — Bonsai uses OpenSearch which fails the ES product check, causing
+# every article save to 500. Our own guarded signal in search/signals.py
+# handles indexing safely with try/except.
+ELASTICSEARCH_DSL_AUTOSYNC = False
+
 # JWT cookies — SameSite=None required for cross-origin cookie auth (frontend on different domain).
 # Secure=True is required whenever SameSite=None is used (browser enforces this).
 REST_AUTH = {
