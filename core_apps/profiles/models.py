@@ -62,10 +62,10 @@ class Profile(TimeStampedModel):
         return f"{self.user.first_name}'s Profile"
 
     def follow(self, profile):
-        self.followers.add(profile)
+        profile.followers.add(self)
 
     def unfollow(self, profile):
-        self.followers.remove(profile)
+        profile.followers.remove(self)
 
     def check_following(self, profile):
-        return self.followers.filter(pkid=profile.pkid).exists()
+        return profile.followers.filter(pkid=self.pkid).exists()
