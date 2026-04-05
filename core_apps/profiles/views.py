@@ -98,7 +98,7 @@ class FollowAPIView(APIView):
         try:
             follower = Profile.objects.get(user=self.request.user)
             user_profile = request.user.profile
-            profile = Profile.objects.get(user__id=user_id)
+            profile = Profile.objects.get(id=user_id)
 
             if profile == follower:
                 raise CantFollowYourself()
@@ -129,7 +129,7 @@ class FollowAPIView(APIView):
 class UnfollowAPIView(APIView):
     def post(self, request, user_id, *args, **kwargs):
         user_profile = request.user.profile
-        profile = Profile.objects.get(user__id=user_id)
+        profile = Profile.objects.get(id=user_id)
 
         if not user_profile.check_following(profile):
             formatted_response = {
