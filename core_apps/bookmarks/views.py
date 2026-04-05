@@ -3,8 +3,11 @@ from uuid import UUID
 from django.db import IntegrityError
 from rest_framework import generics, permissions
 from rest_framework.exceptions import NotFound, ValidationError
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from core_apps.articles.models import Article
+from core_apps.articles.serializers import ArticleSerializer
 
 from .models import Bookmark
 from .serializers import BookmarkSerializer
@@ -57,3 +60,13 @@ class BookmarkDestroyView(generics.DestroyAPIView):
         if instance.user != user:
             raise ValidationError("You cannot delete a bookmark that is not yours")
         instance.delete()
+
+
+class BookmarkListView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        bookmarks = Bookmark.objects.filter(user=request.user).select_related("article")
+        articles = [b.article for b in bookmarks]
+        serializer = ArticleSerializer(articles, many=True, context={"request": request})
+        return Response({"bookmarks": serializer.data})
