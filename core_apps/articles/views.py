@@ -47,18 +47,48 @@ class ArticleRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
 
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
-        # Only record views for authenticated users — AnonymousUser can't be a FK value
-        if request.user and request.user.is_authenticated:
-            ArticleView.record_view(
-                article=instance,
-                user=request.user,
-                viewer_ip=request.META.get("REMOTE_ADDR"),
-            )
+        user = request.user if request.user.is_authenticated else None
+        ArticleView.record_view(
+            article=instance,
+            user=user,
+            viewer_ip=request.META.get("REMOTE_ADDR"),
+        )
         serializer = self.get_serializer(instance)
         return Response(serializer.data)
 
     def perform_update(self, serializer):
         serializer.save(author=self.request.user)
+
+
+class StatsView(APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def get(self, _request):
+        from core_apps.profiles.models import Profile
+
+        articles_count = Article.objects.count()
+        writers_count = Profile.objects.count()
+        authenticated_readers = (
+            ArticleView.objects.filter(user__isnull=False)
+            .values("user")
+            .distinct()
+            .count()
+        )
+        guest_readers = (
+            ArticleView.objects.filter(user__isnull=True)
+            .values("viewer_ip")
+            .distinct()
+            .count()
+        )
+        readers_count = authenticated_readers + guest_readers
+
+        return Response(
+            {
+                "articles_count": articles_count,
+                "writers_count": writers_count,
+                "readers_count": readers_count,
+            }
+        )
 
 
 class ClapArticleView(APIView):
