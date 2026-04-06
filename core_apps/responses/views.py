@@ -8,7 +8,7 @@ from .serializers import ResponseSerializer
 
 class ResponseListCreateView(generics.ListCreateAPIView):
     queryset = Response.objects.all()
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     serializer_class = ResponseSerializer
 
     def get_queryset(self):
