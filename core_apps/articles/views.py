@@ -48,10 +48,12 @@ class ArticleRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
         user = request.user if request.user.is_authenticated else None
+        forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR")
+        viewer_ip = forwarded_for.split(",")[0].strip() if forwarded_for else request.META.get("REMOTE_ADDR")
         ArticleView.record_view(
             article=instance,
             user=user,
-            viewer_ip=request.META.get("REMOTE_ADDR"),
+            viewer_ip=viewer_ip,
         )
         serializer = self.get_serializer(instance)
         return Response(serializer.data)
