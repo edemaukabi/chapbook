@@ -30,6 +30,8 @@ def api_root(request):
             "responses": f"{base}responses/",
             "search": f"{base}elastic/search/",
         },
+        "built_by": "Edema Ukabi",
+        "portfolio": "https://edemaukabi.dev",
     })
 
 schema_view = get_schema_view(
