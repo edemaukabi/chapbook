@@ -38,8 +38,12 @@ schema_view = get_schema_view(
     openapi.Info(
         title="Chapbook API",
         default_version="v1",
-        description="API endpoints for Chapbook",
-        contact=openapi.Contact(email="edemacode@gmail.com"),
+        description="API endpoints for Chapbook — a multi-author publishing platform.",
+        contact=openapi.Contact(
+            name="Edema Ukabi",
+            url="https://edemaukabi.dev",
+            email="edemacode@gmail.com",
+        ),
         license=openapi.License(name="MIT License"),
     ),
     public=True,
