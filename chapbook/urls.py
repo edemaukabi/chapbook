@@ -38,7 +38,7 @@ schema_view = get_schema_view(
     openapi.Info(
         title="Chapbook API",
         default_version="v1",
-        description="API endpoints for Chapbook — a multi-author publishing platform.",
+        description="API endpoints for Chapbook — a multi-author publishing platform.\n\nBuilt by [Edema Ukabi](https://edemaukabi.dev)",
         contact=openapi.Contact(
             name="Edema Ukabi",
             url="https://edemaukabi.dev",
