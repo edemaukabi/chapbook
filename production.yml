@@ -1,0 +1,65 @@
+version: "3.9"
+
+# Chapbook — VPS production stack
+# Run from src/ directory: docker compose -f production.yml up -d --build
+# Network must be created first: docker network create chapbook_prod_nw
+
+services:
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    ports:
+      - "8003:8000"
+    volumes:
+      # Bind mount so host Nginx can serve /static/ directly
+      - ./staticfiles:/app/staticfiles
+    env_file:
+      - ./.envs/.production/.django
+      - ./.envs/.production/.postgres
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - chapbook_prod_nw
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:15-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    env_file:
+      - ./.envs/.production/.postgres
+    networks:
+      - chapbook_prod_nw
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    networks:
+      - chapbook_prod_nw
+    restart: unless-stopped
+
+  celery_worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    # Override the gunicorn CMD — just run the Celery worker
+    command: sh -c "celery -A chapbook.celery worker --loglevel=info"
+    env_file:
+      - ./.envs/.production/.django
+      - ./.envs/.production/.postgres
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - chapbook_prod_nw
+    restart: unless-stopped
+
+networks:
+  chapbook_prod_nw:
+    external: true
+
+volumes:
+  postgres_data:
