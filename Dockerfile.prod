@@ -32,7 +32,8 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
 COPY --from=python-build-stage /usr/src/app/wheels /wheels/
 
 RUN pip install --no-cache-dir --no-index --find-links=/wheels/ /wheels/* \
-  && rm -rf /wheels/
+  && rm -rf /wheels/ \
+  && pip install --no-cache-dir "setuptools<72"
 
 COPY . ${APP_HOME}
 
