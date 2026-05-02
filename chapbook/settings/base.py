@@ -200,11 +200,14 @@ SIMPLE_JWT = {
     "USER_ID_CLAIM": "user_id",
 }
 
+FRONTEND_URL = env("FRONTEND_URL", default="http://localhost:3000")
+
 REST_AUTH = {
     "USE_JWT": True,
     "JWT_AUTH_COOKIE": "chapbook-access-token",
     "JWT_AUTH_REFRESH_COOKIE": "chapbook-refresh-token",
     "REGISTER_SERIALIZER": "core_apps.users.serializers.CustomRegisterSerializer",
+    "PASSWORD_RESET_SERIALIZER": "core_apps.users.serializers.CustomPasswordResetSerializer",
 }
 
 AUTHENTICATION_BACKENDS = [
