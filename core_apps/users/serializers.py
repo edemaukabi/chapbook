@@ -50,7 +50,7 @@ class CustomPasswordResetSerializer(PasswordResetSerializer):
             msg = EmailMultiAlternatives(
                 subject="Reset your Chapbook password",
                 body=plain,
-                from_email=settings.DEFAULT_FROM_EMAIL,
+                from_email=f"Chapbook <{settings.DEFAULT_FROM_EMAIL}>",
                 to=[email],
             )
             msg.attach_alternative(html_body, "text/html")
