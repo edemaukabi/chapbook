@@ -3,6 +3,13 @@ from .base import env
 
 ADMINS = [("Edema Code", "edemacode@gmail.com")]
 
+LOGGING["loggers"] = {  # type: ignore[name-defined]  # noqa: F821
+    "django.security.DisallowedHost": {
+        "handlers": [],
+        "propagate": False,
+    },
+}
+
 SECRET_KEY = env("DJANGO_SECRET_KEY")
 
 DEBUG = False
