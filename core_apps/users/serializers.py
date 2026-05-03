@@ -10,7 +10,9 @@ from django.utils.encoding import force_bytes
 from django.utils.html import strip_tags
 from django.utils.http import urlsafe_base64_encode
 from django_countries.serializer_fields import CountryField
-from loguru import logger
+import logging
+
+logger = logging.getLogger(__name__)
 from phonenumber_field.serializerfields import PhoneNumberField
 from rest_framework import serializers
 
